@@ -1,4 +1,10 @@
 
+/* 
+ * File:   
+ * Author: 
+ * Comments:
+ * Revision history: 
+ */
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
@@ -6,7 +12,7 @@
 #define	__SPI_H
 
 #include <xc.h> // include processor files - each processor file is guarded.  
-#include <pic16f887.h>
+
 typedef enum 
 {
     SPI_MASTER_OSC_DIV4  = 0b00100000,

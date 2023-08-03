@@ -8,7 +8,7 @@ void spiInit(Spi_Type sType, Spi_Data_Sample sDataSample, Spi_Clock_Idle sClockI
         SSPSTAT = sTransmitEdge;
         TRISC3 = 1;
     }
-    else  //Si lo queremos en Master Mode
+    else              //If Master Mode
     {
         SSPSTAT = sDataSample | sTransmitEdge;
         TRISC3 = 0;

@@ -1,11 +1,20 @@
+/* 
+ * File: ADC_int.h
+ * Author: schwe
+ * Comments: Uso para interrupciones del ADC y canales
+ * Revision history: 
+ */
+
 #ifndef ADC_H
 #define	ADC_H
 
+#include <pic16f887.h>
 #include <xc.h> // include processor files - each processor file is guarded.  
-#include <stdint.h>
 
-//Prototipo de funcion
-int readADC(int canal);
-void setupADC(void);
+void setup_ADC(int channel);
+int read_ADC();
+void change_channel_ADC(int channel);
+int get_channel_ADC();
 
-#endif	/* XC_HEADER_TEMPLATE_H */
+#endif	/* ADC_int_H */
+
