@@ -1,14 +1,7 @@
-/* 
- * File: ADC_int.h
- * Author: schwe
- * Comments: Uso para interrupciones del ADC y canales
- * Revision history: 
- */
-
 #ifndef ADC_H
 #define	ADC_H
 
-#include <pic16f887.h>
+
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 void setup_ADC(int channel);
@@ -17,4 +10,3 @@ void change_channel_ADC(int channel);
 int get_channel_ADC();
 
 #endif	/* ADC_int_H */
-

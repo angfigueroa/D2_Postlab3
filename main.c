@@ -2,7 +2,7 @@
  * File:   main.c
  * Author: ANGELA
  *
- * Created on 27 de julio de 2023, 8:18
+ * Created on 27 de julio de 2023, 15:52
  */
 
 // CONFIG1
@@ -29,7 +29,6 @@
 //*****************************************************************************
 #include <xc.h>
 #include <stdint.h>
-#include <pic16f887.h>
 #include "SPI.h"
 //*****************************************************************************
 // Definici?n de variables
@@ -57,47 +56,17 @@ void __interrupt() isr(void){
 // C?digo Principal
 //*****************************************************************************
 void main(void) {
-    
     setup();
-    // Configuración de los puertos
-    TRISB = 0b11111111;  // RB1 como entrada
-    TRISC = 0;              // Puerto A como salida
-    PORTC = 0;              // Inicializar Puerto A en 0
-    
-    // Configuración de las resistencias pull-up
-    OPTION_REGbits.nRBPU = 0;   // Habilitar resistencias pull-up en Puerto B
-    WPUBbits.WPUB6 = 1;         // Habilitar resistencia pull-up en RB0
-    WPUBbits.WPUB7 = 1;  
-    // Habilitar resistencia pull-up en RB1
-    
-    // Variables
-    uint8_t contador = 0;
-   
+    OSCCONbits.IRCF = 0B110;            //Oscilador a 4MHz
+    OSCCONbits.OSTS = 0;
+    OSCCONbits.SCS = 1;
     uint16_t potValue = 0;
     //*************************************************************************
     // Loop infinito
     //*************************************************************************
     while(1){
-        
-        // Incrementar contador si se presiona RB0
-        if (PORTBbits.RB6 == 0) {
-                while (!PORTBbits.RB6); // Esperar a que se suelte el botón
-                contador++;
-        }
-        
-        // Decrementar contador si se presiona RB1
-        if (PORTBbits.RB7 == 0) {
-           
-                while (!PORTBbits.RB7); // Esperar a que se suelte el botón
-                contador = contador - 1;
-            
-        }
-        
-        // Mostrar contador en Puerto A
-        PORTC = contador;
-      
        // Leer el valor analógico del potenciómetro en el puerto E (AN0) usando la función ADC
-        ADCON0bits.CHS = 0; // Seleccionar canal AN0
+        ADCON0bits.CHS = 1; // Seleccionar canal AN0
         ADCON0bits.GO = 1; // Iniciar la conversión
         while(ADCON0bits.GO); // Esperar a que la conversión termine
         potValue = ADRESH; // Leer el resultado de la conversión analógica de 8 bits
@@ -106,54 +75,32 @@ void main(void) {
         PORTB = (uint8_t)potValue;
         
         __delay_ms(250);
-        
-        
     }
-    
     return;
 }
 //*****************************************************************************
 // Funci?n de Inicializaci?n
 //*****************************************************************************
 void setup(void){
-    
-    OSCCONbits.IRCF2 = 1;            //Oscilador a 4MHz
-    OSCCONbits.IRCF1 = 1;
-    OSCCONbits.IRCF0 = 0;
-    
-    OSCCONbits.SCS = 1;
     ANSEL = 0;
     ANSELH = 0;
-    ANSELbits.ANS0 = 1;
     
-    TRISA0 = 1;
-   
-    TRISB6 = 1;
-    TRISB7 = 1;
+    TRISB = 0;
     TRISD = 0;
-    PORTD = 0x00;
+    
+    PORTB = 0;
+    PORTD = 0;
+    
+    // Configuración del módulo ADC
+    ADCON0bits.ADCS = 0b01; // Fosc/8 (2 microsegundos para una conversión)
+    ADCON0bits.CHS = 1; // Seleccionar canal AN0
+    ADCON0bits.ADON = 1; // Habilitar el módulo ADC
     
     INTCONbits.GIE = 1;         // Habilitamos interrupciones
     INTCONbits.PEIE = 1;        // Habilitamos interrupciones PEIE
     PIR1bits.SSPIF = 0;         // Borramos bandera interrupci?n MSSP
     PIE1bits.SSPIE = 1;         // Habilitamos interrupci?n MSSP
     TRISAbits.TRISA5 = 1;       // Slave Select
-    
-    INTCONbits.RBIE = 1;
-    OPTION_REGbits.nRBPU = 0;
-    WPUBbits.WPUB7 = 1;
-    WPUBbits.WPUB6 = 1;
-    IOCBbits.IOCB7 = 1;
-    IOCBbits.IOCB6 = 1;
-    INTCONbits.RBIF = 0;
-    
-    
-    // Configuración del módulo ADC
-    ADCON0bits.ADCS = 0b01; // Fosc/8 (2 microsegundos para una conversión)
-    ADCON0bits.CHS = 0; // Seleccionar canal AN0
-    ADCON0bits.ADON = 1; // Habilitar el módulo ADC
-    
-    
     spiInit(SPI_SLAVE_SS_EN, SPI_DATA_SAMPLE_MIDDLE, SPI_CLOCK_IDLE_LOW, SPI_IDLE_2_ACTIVE);
    
 }

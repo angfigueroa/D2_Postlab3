@@ -44,11 +44,11 @@ void main(void);
 //Setup General
 void setup(void){
     //Oscilador
-    OSCCON = 0B01110001;   //Oscilador a 8Mhz
+    OSCCON = 0B01110001;                                    //Oscilador a 8Mhz
     
     //Interrupciones
-    INTCON = 0B11001000;   //Int globales, PIE1, PORTB activadas
-    PIE1 = 0B01010000;  //Int ADC, SPI activadas
+    INTCON = 0B11001000;                                    //Int globales, PIE1, PORTB activadas
+    PIE1 = 0B01010000;                                      //Int ADC, SPI activadas
     PIR1 = 0B00000000;
     
     //ADC
@@ -86,49 +86,49 @@ void setup(void){
 
 //Interrupcion
 void __interrupt() isr(void) {
-    if (PIR1bits.ADIF){// Verifica si la interrupción es del ADC
-        ADC = read_ADC();// Lee el valor del conversor analógico a digital
+    if (PIR1bits.ADIF){
+        ADC = read_ADC();
     }
     
-    if (INTCONbits.RBIF){// Verifica si la interrupción es por cambio en PORTB
+    if (INTCONbits.RBIF){
         if (!PORTBbits.RB6){
-            rebote1 = 1; // Activa la variable de rebote 1 si se detecta el botón
+            rebote1 = 1;
         }
         else if (!PORTBbits.RB7){
-            rebote2 = 1;// Activa la variable de rebote 2 si se detecta el botón
+            rebote2 = 1;
         }
     }
     
-    if (SSPIF == 1){// Verifica si la interrupción es del módulo SPI
-        in = spiRead();// Lee los datos recibidos por SPI
+    if (SSPIF == 1){
+        in = spiRead();
         if (in == 0){
-            spiWrite(ADC);// Envía el valor del ADC por SPI si se recibe un 0
+            spiWrite(ADC);
         }
         else if (in == 1){
-            spiWrite(contador);// Envía el valor del contador por SPI si se recibe un 1
+            spiWrite(contador);
         }
     }
-    INTCONbits.RBIF = 0;   //Limpia la bandera de interrupción
-    PIR1bits.ADIF = 0;// Limpia la bandera de interrupción del ADC
-    SSPIF = 0;// Limpia la bandera de interrupción del módulo SPI
+    INTCONbits.RBIF = 0;                                    //Limpia la bandera de interrupción
+    PIR1bits.ADIF = 0;
+    SSPIF = 0;
 }
 
 //Loop
 void main(void) {
-    setup();// Llama a la función de configuración
-    while(1){// Bucle infinito
-        if (ADCON0bits.GO == 0){// Verifica si la conversión del ADC está en curso
+    setup();
+    while(1){
+        if (ADCON0bits.GO == 0){
             __delay_ms(5);
-            ADCON0bits.GO = 1;// Inicia una nueva conversión ADC
+            ADCON0bits.GO = 1;
         }
 
-        if (PORTBbits.RB6 && rebote1 == 1){// Verifica el estado del botón 1 y la variable de rebote
-            contador += 1;// Incrementa el contador
-            rebote1 = 0;// Desactiva la variable de rebote
+        if (PORTBbits.RB6 && rebote1 == 1){
+            contador += 1;
+            rebote1 = 0;
         }
-        else if (PORTBbits.RB7 && rebote2 == 1){// Verifica el estado del botón 2 y la variable de rebote
-            contador -= 1;// Decrementa el contador
-            rebote2 = 0;// Desactiva la variable de rebote
+        else if (PORTBbits.RB7 && rebote2 == 1){
+            contador -= 1;
+            rebote2 = 0;
         }
     }
 }
